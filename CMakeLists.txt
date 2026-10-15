@@ -42,10 +42,6 @@ target_link_libraries(MBG808MAGIC
         juce::juce_recommended_warning_flags
 )
 
-# =========================================================================
-# エラー回避: VST2との互換性を無効化する
-# (C1189 error: You may have a conflict with parameter automation... の対策)
-# =========================================================================
 target_compile_definitions(MBG808MAGIC
     PUBLIC
         JUCE_VST3_CAN_REPLACE_VST2=0
