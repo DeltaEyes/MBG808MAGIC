@@ -1,13 +1,11 @@
 ﻿#include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-// FL Studioルック（ホワイト・モノトーン仕様）
 class FLStudioLookAndFeel : public juce::LookAndFeel_V4
 {
 public:
     FLStudioLookAndFeel()
     {
-        // ★ 数値テキストボックスの背景を少し濃い半透明の黒にして読みやすくする
         setColour(juce::Slider::textBoxTextColourId, juce::Colours::white);
         setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
         setColour(juce::Slider::textBoxBackgroundColourId, juce::Colour(0xcc101010));
@@ -64,7 +62,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(AudioPluginAudi
     freqAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "FREQ", freqSlider);
     freqLabel.setText("FREQ", juce::dontSendNotification);
     freqLabel.setJustificationType(juce::Justification::centred);
-    freqLabel.setColour(juce::Label::textColourId, juce::Colours::white); // ★ ラベルを白に変更
+    freqLabel.setColour(juce::Label::textColourId, juce::Colours::white);
     addAndMakeVisible(freqLabel);
 
     intensitySlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -74,7 +72,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(AudioPluginAudi
     intensityAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "INTENSITY", intensitySlider);
     intensityLabel.setText("INT", juce::dontSendNotification);
     intensityLabel.setJustificationType(juce::Justification::centred);
-    intensityLabel.setColour(juce::Label::textColourId, juce::Colours::white); // ★ ラベルを白に変更
+    intensityLabel.setColour(juce::Label::textColourId, juce::Colours::white);
     addAndMakeVisible(intensityLabel);
 
     driveSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -84,7 +82,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(AudioPluginAudi
     driveAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "DRIVE", driveSlider);
     driveLabel.setText("DRIVE", juce::dontSendNotification);
     driveLabel.setJustificationType(juce::Justification::centred);
-    driveLabel.setColour(juce::Label::textColourId, juce::Colours::white); // ★ ラベルを白に変更
+    driveLabel.setColour(juce::Label::textColourId, juce::Colours::white);
     addAndMakeVisible(driveLabel);
 
     setSize(560, 390);
@@ -144,15 +142,11 @@ void AudioPluginAudioProcessorEditor::paint(juce::Graphics &g)
     g.setColour(juce::Colours::white);
     g.strokePath(harmonicCurve, juce::PathStrokeType(1.8f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 
-    // =======================================================
-    // ★ 画像背景と視認性アップのためのダーク・ティント
-    // =======================================================
     juce::Rectangle<float> controlArea(15.0f, 215.0f, 530.0f, 160.0f);
     if (knobBgImage.isValid())
     {
         g.drawImage(knobBgImage, controlArea, juce::RectanglePlacement::stretchToFit);
 
-        // 画像の上に半透明の黒（40%）を重ねて、白いUIパーツを際立たせる
         g.setColour(juce::Colours::black.withAlpha(0.4f));
         g.fillRect(controlArea);
     }

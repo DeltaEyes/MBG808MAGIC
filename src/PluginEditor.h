@@ -14,7 +14,7 @@ public:
 private:
     AudioPluginAudioProcessor &audioProcessor;
 
-    juce::Image knobBgImage; // ★ 埋め込み画像を保持する変数
+    juce::Image knobBgImage;
 
     juce::Slider freqSlider;
     juce::Slider intensitySlider;
