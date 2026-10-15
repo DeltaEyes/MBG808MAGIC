@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 #include <JuceHeader.h>
 
 class AudioPluginAudioProcessor : public juce::AudioProcessor
@@ -36,12 +35,16 @@ public:
     void getStateInformation(juce::MemoryBlock &destData) override;
     void setStateInformation(const void *data, int sizeInBytes) override;
 
-    // パラメータ管理の親玉
     juce::AudioProcessorValueTreeState apvts;
 
 private:
-    // パラメータを定義するための関数
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+    // フィルター群（左右チャンネル独立で処理するため2つずつ用意するのがより安全です）
+    juce::dsp::StateVariableTPTFilter<float> lowPassFilterL;
+    juce::dsp::StateVariableTPTFilter<float> lowPassFilterR;
+    juce::dsp::StateVariableTPTFilter<float> highPassFilterL;
+    juce::dsp::StateVariableTPTFilter<float> highPassFilterR;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessor)
 };

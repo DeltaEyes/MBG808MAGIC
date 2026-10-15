@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
@@ -15,10 +14,19 @@ public:
 private:
     AudioPluginAudioProcessor &audioProcessor;
 
-    // ツマミ本体
+    // 3つのツマミ
+    juce::Slider freqSlider;
+    juce::Slider intensitySlider;
     juce::Slider driveSlider;
 
-    // ツマミとProcessorのAPVTSを繋ぐ紐
+    // 3つのラベル（文字）
+    juce::Label freqLabel;
+    juce::Label intensityLabel;
+    juce::Label driveLabel;
+
+    // APVTSとの紐付け
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> freqAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> intensityAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> driveAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessorEditor)
