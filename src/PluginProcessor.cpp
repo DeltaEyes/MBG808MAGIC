@@ -18,22 +18,12 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {}
 
-// =======================================================
-// ★ 3つのツマミの登録
-// =======================================================
 juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
-
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID("FREQ", 1), "Freq (Hz)", 32.0f, 256.0f, 80.0f));
-
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID("INTENSITY", 1), "Intensity (dB)", -24.0f, 24.0f, 0.0f));
-
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID("DRIVE", 1), "Drive", 1.0f, 10.0f, 5.0f));
-
+    layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID("FREQ", 1), "Freq (Hz)", 32.0f, 256.0f, 80.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID("INTENSITY", 1), "Intensity (dB)", -24.0f, 24.0f, 0.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID("DRIVE", 1), "Drive", 1.0f, 10.0f, 5.0f));
     return layout;
 }
 
@@ -48,15 +38,12 @@ void AudioPluginAudioProcessor::setCurrentProgram(int index) {}
 const juce::String AudioPluginAudioProcessor::getProgramName(int index) { return {}; }
 void AudioPluginAudioProcessor::changeProgramName(int index, const juce::String &newName) {}
 
-// =======================================================
-// ★ フィルターの準備
-// =======================================================
 void AudioPluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     juce::dsp::ProcessSpec spec;
     spec.sampleRate = sampleRate;
     spec.maximumBlockSize = samplesPerBlock;
-    spec.numChannels = 1; // 左右独立して処理するため1chとして初期化
+    spec.numChannels = 1;
 
     lowPassFilterL.prepare(spec);
     lowPassFilterL.setType(juce::dsp::StateVariableTPTFilterType::lowpass);
@@ -81,57 +68,42 @@ bool AudioPluginAudioProcessor::isBusesLayoutSupported(const BusesLayout &layout
 }
 #endif
 
-// =======================================================
-// ★ RBass アルゴリズム本体
-// =======================================================
 void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
-
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+    for (auto i = getTotalNumInputChannels(); i < getTotalNumOutputChannels(); ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    // 1. ツマミの値を取得
     float freq = apvts.getRawParameterValue("FREQ")->load();
     float intensityDB = apvts.getRawParameterValue("INTENSITY")->load();
     float drive = apvts.getRawParameterValue("DRIVE")->load();
-
-    // 2. フィルターの周波数とブレンド量を更新
     float intensity = juce::Decibels::decibelsToGain(intensityDB);
+
     lowPassFilterL.setCutoffFrequency(freq);
     lowPassFilterR.setCutoffFrequency(freq);
-    highPassFilterL.setCutoffFrequency(freq * 1.2f); // 基音をカットするために少し上を設定
+    highPassFilterL.setCutoffFrequency(freq * 1.2f);
     highPassFilterR.setCutoffFrequency(freq * 1.2f);
 
-    // 3. 音声処理
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    for (int channel = 0; channel < getTotalNumInputChannels(); ++channel)
     {
         auto *channelData = buffer.getWritePointer(channel);
-
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
             float in = channelData[sample];
-
-            // LとRで使うフィルターを分ける
             float low = 0.0f;
             float harmonicsOnly = 0.0f;
-
             if (channel == 0)
-            { // Left
+            {
                 low = lowPassFilterL.processSample(0, in);
                 float distortedLow = std::tanh(low * drive) + (low * low * drive * 0.2f);
                 harmonicsOnly = highPassFilterL.processSample(0, distortedLow);
             }
             else if (channel == 1)
-            { // Right
+            {
                 low = lowPassFilterR.processSample(0, in);
                 float distortedLow = std::tanh(low * drive) + (low * low * drive * 0.2f);
                 harmonicsOnly = highPassFilterR.processSample(0, distortedLow);
             }
-
-            // 原音に、音量調整した倍音を足して出力
             channelData[sample] = in + (harmonicsOnly * intensity);
         }
     }

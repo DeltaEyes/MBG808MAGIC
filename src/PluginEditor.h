@@ -14,17 +14,15 @@ public:
 private:
     AudioPluginAudioProcessor &audioProcessor;
 
-    // 3つのツマミ
+    juce::Image knobBgImage; // ★ 埋め込み画像を保持する変数
+
     juce::Slider freqSlider;
     juce::Slider intensitySlider;
     juce::Slider driveSlider;
-
-    // 3つのラベル（文字）
     juce::Label freqLabel;
     juce::Label intensityLabel;
     juce::Label driveLabel;
 
-    // APVTSとの紐付け
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> freqAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> intensityAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> driveAttachment;
