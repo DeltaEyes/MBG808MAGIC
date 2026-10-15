@@ -19,7 +19,7 @@
 ---
 
 ## 使用方法
-MBG808MAGIC.zipをダウンロードし、解凍後フォルダ内部のMBG808MAGIC.vat3をお使いの環境の指定のVST3フォルダにコピーしてください。
+MBG808MAGIC.zipをダウンロードし、解凍後フォルダ内部のMBG808MAGIC.vst3をお使いの環境の指定のVST3フォルダにコピーしてください。
 
 ## 【開発者向け】ビルド方法 (Build Instructions)
 
