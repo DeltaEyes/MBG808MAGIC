@@ -18,9 +18,7 @@ public:
 
     juce::AudioProcessorEditor *createEditor() override;
     bool hasEditor() const override;
-
     const juce::String getName() const override;
-
     bool acceptsMidi() const override;
     bool producesMidi() const override;
     bool isMidiEffect() const override;
@@ -40,7 +38,6 @@ public:
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
-    // フィルター群（左右チャンネル独立で処理するため2つずつ用意するのがより安全です）
     juce::dsp::StateVariableTPTFilter<float> lowPassFilterL;
     juce::dsp::StateVariableTPTFilter<float> lowPassFilterR;
     juce::dsp::StateVariableTPTFilter<float> highPassFilterL;
